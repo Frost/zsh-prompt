@@ -5,16 +5,28 @@
 #
 # Requires the `git-info` zmodule to be included in the .zimrc file.
 
-_prompt_steeef_venv() {
+_prompt_frost_git() {
+  if [[ -n ${git_info} ]] print -n "${(e)git_info[prompt]}"
+}
+
+_prompt_frost_virtualenv() {
   if [[ -n ${VIRTUAL_ENV} ]] print -n " (%F{blue}${VIRTUAL_ENV:t}%f)"
+}
+
+_prompt_frost_status() {
+  print -n "%(?:%F{white}:%F{red}%B)%?%b"
+}
+
+_prompt_frost_elapsed() {
+  print -n "$(history -D 2>/dev/null | tail -n1 | awk '{ print $2 }')"
 }
 
 # use extended color palette if available
 if (( terminfo[colors] >= 256 )); then
-  : ${USER_COLOR=135}
-  : ${HOST_COLOR=166}
-  : ${PWD_COLOR=118}
-  : ${BRANCH_COLOR=81}
+  : ${USER_COLOR=22}
+  : ${HOST_COLOR=23}
+  : ${PWD_COLOR=17}
+  : ${BRANCH_COLOR=23}
   : ${UNINDEXED_COLOR=166}
   : ${INDEXED_COLOR=118}
   : ${UNTRACKED_COLOR=161}
@@ -53,6 +65,6 @@ if (( ${+functions[git-info]} )); then
 fi
 
 PS1='
-%F{${USER_COLOR}}%n%f at %F{${HOST_COLOR}}%m%f in %F{${PWD_COLOR}}%~%f${(e)git_info[prompt]}$(_prompt_steeef_venv)
-%(!.#.$) '
-unset RPS1
+%F{232}[%*] ($(_prompt_frost_elapsed)) %F{${USER_COLOR}}%n${col_at}%F{15}@%F{${HOST_COLOR}}%m%f %F{${PWD_COLOR}}%~%f
+$(_prompt_frost_status)%f|$(_prompt_frost_git)%(!.#.>) '
+RPS1='$(_prompt_frost_virtualenv)'
